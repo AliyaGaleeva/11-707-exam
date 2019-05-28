@@ -1,0 +1,33 @@
+select s1.city, s1.sname, s2.sname from Salespeople s1, Salespeople s2 
+where s1.city = s2.city and s1.snum != s2.snum and s1.sname < s2.sname  --ch9 #1
+
+select Distinct o1.odate, s.sname, s1.sname from Orders o1, Salespeople s, Orders o2, Salespeople s1 
+where o1.odate = o2.odate and o1.snum < o2.snum  and o1.snum = s.snum and o2.snum=s1.snum--ch9 #4
+
+select sname, city from Salespeople s
+where s.comm > (select comm from Salespeople where snum = 1001)  --9 #6
+
+select * from Orders o
+where o.cnum = (select cnum from Customers where cname = 'Cisneros')  --ch10 #1
+
+select Distinct s.sname, s.comm from  Orders o, Salespeople s
+where o.cnum in (select c.cnum from Customers c where c.rating >  (select avg(rating) from Customers)) and o.snum = s.snum  --ch10 #4
+
+//
+select o.cnum, c.cname, count(*)  from Orders o, Customers c
+where (select min(o1.amt) from Orders o1 where o1.cnum = o.cnum)  > (select avg(amt) from Orders) and c.cnum = o.cnum
+group by o.cnum  --ch10 #6     ÍÅ ÐÀÁÎÒÀÅÒ
+//
+
+select o.snum, sum(o.amt) from Orders o
+where (select sum(s1.amt) from Orders s1 where o.snum = s1.snum group by s1.snum) > (select max(s2.amt) from Orders s2)
+group by o.snum --ch10 #5
+
+select c.cname, c.cnum from Customers c
+where c.rating = (select max(c1.rating) from Customers c1 where c.city=c1.city group by c1.city) --ch11 #1
+
+select * from Salespeople s
+where exists(select * from Customers c where s.snum=c.snum and c.rating=300)  --ch11 #4
+
+select * from Orders o
+where (select count(*) from Orders o1 where o.cnum = o1.cnum group by o1.cnum) >1  --ch11 #7
